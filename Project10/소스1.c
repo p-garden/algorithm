@@ -6,7 +6,7 @@ int main() {
 	printf("Enter Array Size : ");
 	scanf("%d", &n);
 
-	a = (double*)malloc(n * sizeof(double));
+	a = (double*)malloc(n * sizeof(double)); 
 
 	printf("Enter %d numbers in sorted order: ", n);
 	for (i = 0; i < n; i++)
