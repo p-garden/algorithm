@@ -1,26 +1,29 @@
 #include <stdio.h>
 int main() {
-	int i, n, key;
-	int a[100];
-	printf("Enter Array length(up to 100): ");
+	int n, i, left, right, mid, *a, key;
+	printf("Enter Array Size : ");
 	scanf("%d", &n);
-	if (n > 100) {
-		printf("Array size exceeds limit of 100\n");
-		return 1;
-	}
-	printf("Enter %d array elements:\n", n);
-	for (i = 0; i < n; i++) {
+
+	a = (int*)malloc(n * sizeof(int));
+
+	printf("Enter %d numbers in sorted order: ", n);
+	for (i = 0; i < n; i++)
 		scanf("%d", &a[i]);
-	}
-	printf("Enter search key: ");
+	left = 0, right = n - 1, mid = (left + right) / 2;
+	printf("Enter search Key: ");
 	scanf("%d", &key);
-	for (i = 0; i < n; i++) {
-		if (a[i] == key) {
-			printf("key's  position: %d\n", i);
+	while (left <= right) {
+		if (key < a[mid])
+			right = mid - 1;
+		else if (key > a[mid])
+			left = mid + 1;
+		else {
+			printf("Found at Location %d\n", mid);
 			break;
 		}
-		if (i == n - 1)
-			printf("Not Found\n");
+		mid = (left + right) / 2;
 	}
+	if (left > right)
+		printf("Not Found\n");
 	return 0;
 }
