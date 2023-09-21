@@ -1,29 +1,31 @@
 #include <stdio.h>
-int main() {
-	int n, i, j, temp,*a;
-	printf("Enter Array Size: ");
+int main()
+{
+	int a[100], n, i, j, position, swap, min_idx, temp, res;
+	printf("Enter Number of Elements n :");
 	scanf("%d", &n);
-	a = (int*)malloc(n * sizeof(int));
-	printf("Input: number [%d]: ", n);
+	printf("Enter %d Numbers n: \n", n);
 	for (i = 0; i < n; i++)
 		scanf("%d", &a[i]);
-
-
-	for (i = 0; i < n; i++) {
-		for (j = 0; j < n - 1; j++) {
-			if (a[j] < a[j + 1]) {
-				temp = a[j];
-				a[j] = a[j + 1];
-				a[j + 1] = temp;
+	
+	for (i = 0; i < n - 1; i++) {
+		min_idx = i;
+		for (j = i + 1; j < n; j++) {
+			if (a[j] < a[min_idx]) {
+				min_idx = j;
 			}
 		}
+		temp = a[min_idx];
+		a[min_idx] = a[i];
+		a[i] = temp;
 	}
-	printf("Output: \n");
+	printf("Sorted Array:\n");
 	for (i = 0; i < n; i++) {
-		printf("%d: %d\n",i, a[i]);
+		printf("%d ", a[i]);
 	}
-	printf("largest element: %d\n", a[0]);
-	printf("smallest element: %d\n", a[n-1]);
-	free(a);
+	printf("\n");
+
+	printf("minimum: %d\n", a[0]);
+	printf("maximum: %d\n", a[n - 1]);
 	return 0;
 }
