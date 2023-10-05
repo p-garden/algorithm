@@ -1,31 +1,68 @@
 #include <stdio.h>
-int main()
-{
-	int a[100], n, i, j, position, swap, min_idx, temp, res;
-	printf("Enter Number of Elements n :");
-	scanf("%d", &n);
-	printf("Enter %d Numbers n: \n", n);
-	for (i = 0; i < n; i++)
-		scanf("%d", &a[i]);
-	
-	for (i = 0; i < n - 1; i++) {
-		min_idx = i;
-		for (j = i + 1; j < n; j++) {
-			if (a[j] < a[min_idx]) {
-				min_idx = j;
-			}
-		}
-		temp = a[min_idx];
-		a[min_idx] = a[i];
-		a[i] = temp;
+#include <stdlib.h>
+void merge(int arr[], int l, int m, int r) {
+	int i, j, k;
+	int n1 = m - l + 1;
+	int n2 = r - m;
+	int *L,*R;
+	L = (int*)malloc(n1 * sizeof(int));
+	R = (int*)malloc(n2 * sizeof(int));
+	for (i = 0; i < n1; i++) {
+		L[i] = arr[l + i];
 	}
-	printf("Sorted Array:\n");
-	for (i = 0; i < n; i++) {
-		printf("%d ", a[i]);
+	for (j = 0; j < n2; j++) {
+		R[j] = arr[m + 1 + j];	
+	}
+	i = 0;
+	j = 0;
+	k = l;
+	while (i < n1 && j < n2) {
+		if (L[i] >= R[j]) {
+			arr[k] = L[i];
+			i++;
+		}
+		else {
+			arr[k] = R[j];
+			j++;
+		}
+		k++;
+	}
+	while (i < n1) {
+		arr[k] = L[i];
+		i++;
+		k++;
+	}
+	while (j < n2) {
+		arr[k] = R[j];
+		j++;
+		k++;
+	}
+}
+void mergeSort(int arr[], int l, int r) {
+	if (l < r) {
+		int m = l + (r - l) / 2;
+		mergeSort(arr, l, m);
+		mergeSort(arr, m + 1, r);
+		merge(arr, l, m, r);
+	}
+}
+void printArray(int A[], int size) {
+	int i;
+	for (i = 0; i < size; i++) {
+		printf("%d ", A[i]);
 	}
 	printf("\n");
-
-	printf("minimum: %d\n", a[0]);
-	printf("maximum: %d\n", a[n - 1]);
+}
+int main() {
+	int arr[1000], arr_size;
+	printf("Enter Number of Elements in Array : ");
+	scanf("%d", &arr_size);
+	printf("Enter Elements of Array : \n");
+	for (int i = 0; i < arr_size; i++) {
+		scanf("%d", &arr[i]);
+	}
+	mergeSort(arr, 0, arr_size - 1);
+	printf("\nSorted Array is : ");
+	printArray(arr, arr_size);
 	return 0;
 }
