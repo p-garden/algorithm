@@ -1,68 +1,41 @@
 #include <stdio.h>
 #include <stdlib.h>
-void merge(int arr[], int l, int m, int r) {
-	int i, j, k;
-	int n1 = m - l + 1;
-	int n2 = r - m;
-	int *L,*R;
-	L = (int*)malloc(n1 * sizeof(int));
-	R = (int*)malloc(n2 * sizeof(int));
-	for (i = 0; i < n1; i++) {
-		L[i] = arr[l + i];
+void countsort(int arr[], int n) { //count sort function start
+	int max = 0; //input array's maximum element -> count array's size
+	for (int i = 0; i < n; i++) 
+		if (arr[i] > max)
+			max = arr[i];    //finding maximum element in input array
+	int* count_arr = (int*)malloc((max + 1) * sizeof(int)); // dynamically allocate count array size:max+1
+	if (count_arr == NULL) {
+		perror("Memory allocation failed");
+		exit(1); // Exits program with an error code
 	}
-	for (j = 0; j < n2; j++) {
-		R[j] = arr[m + 1 + j];	
-	}
-	i = 0;
-	j = 0;
-	k = l;
-	while (i < n1 && j < n2) {
-		if (L[i] >= R[j]) {
-			arr[k] = L[i];
-			i++;
+	for (int i = 0; i <= max; i++)
+		count_arr[i] = 0;   //count array's element reset to 0
+	for (int i = 0; i < n; i++)
+		count_arr[arr[i]]++; //Make the number of each element in the input array a count array	
+	int* output_arr = (int*)malloc(sizeof(int)*n);
+	int op_idx = 0; //  This keeps track of the next position to insert a number into outputArray
+
+	for (int i = 0; i <= max; i++) {    //To rearrange each element of the input element
+		while (count_arr[i] > 0) {     //Place input array'element as many as in the count array to output array
+			output_arr[op_idx] = i;    
+			op_idx++;
+			count_arr[i]--;
 		}
-		else {
-			arr[k] = R[j];
-			j++;
-		}
-		k++;
 	}
-	while (i < n1) {
-		arr[k] = L[i];
-		i++;
-		k++;
-	}
-	while (j < n2) {
-		arr[k] = R[j];
-		j++;
-		k++;
-	}
+	for (int i = 0; i < n; i++)
+		printf("%d ", output_arr[i]); //print output array
+	free(count_arr);  //releasing memory
+	free(output_arr);  //releasing memory
 }
-void mergeSort(int arr[], int l, int r) {
-	if (l < r) {
-		int m = l + (r - l) / 2;
-		mergeSort(arr, l, m);
-		mergeSort(arr, m + 1, r);
-		merge(arr, l, m, r);
-	}
-}
-void printArray(int A[], int size) {
-	int i;
-	for (i = 0; i < size; i++) {
-		printf("%d ", A[i]);
-	}
-	printf("\n");
-}
-int main() {
-	int arr[1000], arr_size;
-	printf("Enter Number of Elements in Array : ");
-	scanf("%d", &arr_size);
-	printf("Enter Elements of Array : \n");
-	for (int i = 0; i < arr_size; i++) {
-		scanf("%d", &arr[i]);
-	}
-	mergeSort(arr, 0, arr_size - 1);
-	printf("\nSorted Array is : ");
-	printArray(arr, arr_size);
-	return 0;
+int main()
+{
+	// Declaring and initializing the input array
+	int inputArray[] = { 4, 3, 12, 1, 5, 5, 3, 9 };
+	// Calculating the number of elements in inputArray
+	int N = sizeof(inputArray) / sizeof(inputArray[0]);
+	// Calling countSort to sort the numbers in inputArray and print them
+	countsort(inputArray, N);
+	return 0; // Returning 0 indicates successful execution of the program
 }
