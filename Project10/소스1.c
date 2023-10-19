@@ -1,50 +1,70 @@
 #include <stdio.h>
-#include <stdlib.h>
-// Function to determine the maximum value in the given array
-int getMax(int arr[], int n) {
-	int mx = arr[0]; // Start by assuming the first element is the maximum
-	for (int i = 1; i < n; i++) // Loop through all other elements
-		if (arr[i] > mx) // If current element is greater than the current max
-			mx = arr[i]; // Update the max value
-	return mx; // Return the maximum value found
+// Function to swap the position of two elements
+void swap(int* a, int* b)
+{
+	int temp = *a;
+	*a = *b;
+	*b = temp;
 }
-// A counting sort function that sorts based on individual digit values represented by exp
-void countSort(int arr[], int n, int exp) {
-	int* output = (int*)malloc(n * sizeof(int)); // Allocate memory for the output array
-	int i, count[10] = { 0 }; // Initialize a count array to track frequencies of digits
-	for (i = 0; i < n; i++) // Populate the count array with frequencies of the current digit of all numbers
-		count[(arr[i] / exp) % 10]++;
-	for (i = 1; i < 10; i++) // Modify the count array so each index will show the cumulative frequency
-		count[i] += count[i - 1];
-	for (i = n - 1; i >= 0; i--) { // Place numbers in the output array according to their current digit value
-		output[count[(arr[i] / exp) % 10] - 1] = arr[i];
-		count[(arr[i] / exp) % 10]--;
+// To heapify a subtree rooted with node i
+// which is an index in arr[].
+// n is size of heap
+void heapify(int arr[], int N, int i)
+{
+	// Find largest among root,
+	// left child and right child
+	// Initialize largest as root
+	int largest = i;
+	// left = 2*i + 1
+	int left = 2 * i + 1;
+	// right = 2*i + 2
+	int right = 2 * i + 2;
+	// If left child is larger than root
+	if (left < N && arr[left] > arr[largest])
+		largest = left;
+	// If right child is larger than largest
+	// so far
+	if (right < N && arr[right] > arr[largest])
+		largest = right;
+	// Swap and continue heapifying
+	// if root is not largest
+	// If largest is not root
+	if (largest != i) {
+		swap(&arr[i], &arr[largest]);
+		// Recursively heapify the affected
+		// sub-tree
+		heapify(arr, N, largest);
 	}
-	for (i = 0; i < n; i++) // Copy the sorted numbers from the output array back to the original array
-		arr[i] = output[i];
-	free(output); // Free the memory allocated for the output array
 }
-// Utility function to print the array
-void print(int arr[], int n) {
-	for (int i = 0; i < n; i++) // Loop through each element in the array
-		printf("%d ", arr[i]); // Print the current element
+// Main function to do heap sort
+void heapSort(int arr[], int N)
+{
+	// Build max heap
+	for (int i = N / 2 - 1; i >= 0; i--)
+		heapify(arr, N, i);
+	// Heap sort
+	for (int i = N - 1; i >= 0; i--) {
+		swap(&arr[0], &arr[i]);
+		// Heapify root element
+		// to get highest element at
+		// root again
+		heapify(arr, i, 0);
+	}
+}
+// A utility function to print array of size n
+void printArray(int arr[], int N)
+{
+	for (int i = 0; i < N; i++)
+		printf("%d ", arr[i]);
 	printf("\n");
 }
-// Radix Sort function
-void radixsort(int arr[], int n) {
-	int m = getMax(arr, n); // Determine the maximum number in the array to know the number of digits
-	// Do counting sort for every digit
-	for (int exp = 1; m / exp > 0; exp *= 10) { // The variable 'exp' helps in extracting individual digits from a number
-		countSort(arr, n, exp);
-
-	}
-}
-
-// Main function
-int main() {
-	int arr[] = { 543, 986, 217, 765, 329 }; // Sample array to be sorted
-	int n = sizeof(arr) / sizeof(arr[0]); // Determine the number of elements in the array
-	radixsort(arr, n); // Call the radix sort function to sort the array
-	print(arr, n); // Print the sorted array
-	return 0;
+// Driver's code
+int main()
+{
+	int arr[] = { 12, 11, 13, 5, 6, 7 };
+	int N = sizeof(arr) / sizeof(arr[0]);
+	// Function call
+	heapSort(arr, N);
+	printf("Sorted array is\n");
+	printArray(arr, N);
 }
