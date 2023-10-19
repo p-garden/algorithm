@@ -1,41 +1,50 @@
 #include <stdio.h>
 #include <stdlib.h>
-void countsort(int arr[], int n) { //count sort function start
-	int max = 0; //input array's maximum element -> count array's size
-	for (int i = 0; i < n; i++) 
-		if (arr[i] > max)
-			max = arr[i];    //finding maximum element in input array
-	int* count_arr = (int*)malloc((max + 1) * sizeof(int)); // dynamically allocate count array size:max+1
-	if (count_arr == NULL) {
-		perror("Memory allocation failed");
-		exit(1); // Exits program with an error code
-	}
-	for (int i = 0; i <= max; i++)
-		count_arr[i] = 0;   //count array's element reset to 0
-	for (int i = 0; i < n; i++)
-		count_arr[arr[i]]++; //Make the number of each element in the input array a count array	
-	int* output_arr = (int*)malloc(sizeof(int)*n);
-	int op_idx = 0; //  This keeps track of the next position to insert a number into outputArray
-
-	for (int i = 0; i <= max; i++) {    //To rearrange each element of the input element
-		while (count_arr[i] > 0) {     //Place input array'element as many as in the count array to output array
-			output_arr[op_idx] = i;    
-			op_idx++;
-			count_arr[i]--;
-		}
-	}
-	for (int i = 0; i < n; i++)
-		printf("%d ", output_arr[i]); //print output array
-	free(count_arr);  //releasing memory
-	free(output_arr);  //releasing memory
+// Function to determine the maximum value in the given array
+int getMax(int arr[], int n) {
+	int mx = arr[0]; // Start by assuming the first element is the maximum
+	for (int i = 1; i < n; i++) // Loop through all other elements
+		if (arr[i] > mx) // If current element is greater than the current max
+			mx = arr[i]; // Update the max value
+	return mx; // Return the maximum value found
 }
-int main()
-{
-	// Declaring and initializing the input array
-	int inputArray[] = { 4, 3, 12, 1, 5, 5, 3, 9 };
-	// Calculating the number of elements in inputArray
-	int N = sizeof(inputArray) / sizeof(inputArray[0]);
-	// Calling countSort to sort the numbers in inputArray and print them
-	countsort(inputArray, N);
-	return 0; // Returning 0 indicates successful execution of the program
+// A counting sort function that sorts based on individual digit values represented by exp
+void countSort(int arr[], int n, int exp) {
+	int* output = (int*)malloc(n * sizeof(int)); // Allocate memory for the output array
+	int i, count[10] = { 0 }; // Initialize a count array to track frequencies of digits
+	for (i = 0; i < n; i++) // Populate the count array with frequencies of the current digit of all numbers
+		count[(arr[i] / exp) % 10]++;
+	for (i = 1; i < 10; i++) // Modify the count array so each index will show the cumulative frequency
+		count[i] += count[i - 1];
+	for (i = n - 1; i >= 0; i--) { // Place numbers in the output array according to their current digit value
+		output[count[(arr[i] / exp) % 10] - 1] = arr[i];
+		count[(arr[i] / exp) % 10]--;
+	}
+	for (i = 0; i < n; i++) // Copy the sorted numbers from the output array back to the original array
+		arr[i] = output[i];
+	free(output); // Free the memory allocated for the output array
+}
+// Utility function to print the array
+void print(int arr[], int n) {
+	for (int i = 0; i < n; i++) // Loop through each element in the array
+		printf("%d ", arr[i]); // Print the current element
+	printf("\n");
+}
+// Radix Sort function
+void radixsort(int arr[], int n) {
+	int m = getMax(arr, n); // Determine the maximum number in the array to know the number of digits
+	// Do counting sort for every digit
+	for (int exp = 1; m / exp > 0; exp *= 10) { // The variable 'exp' helps in extracting individual digits from a number
+		countSort(arr, n, exp);
+
+	}
+}
+
+// Main function
+int main() {
+	int arr[] = { 543, 986, 217, 765, 329 }; // Sample array to be sorted
+	int n = sizeof(arr) / sizeof(arr[0]); // Determine the number of elements in the array
+	radixsort(arr, n); // Call the radix sort function to sort the array
+	print(arr, n); // Print the sorted array
+	return 0;
 }
