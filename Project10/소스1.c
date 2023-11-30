@@ -1,169 +1,39 @@
-/** C implementation for
-Red-Black Tree Insertion**/
 #include <stdio.h>
-#include <stdlib.h>
-// Definition of the structure for a red-black tree node
-struct node {
-	int d; // 'd' is for storing the data value in the node
-	int c; // 'c' represents the color of the node: 1 for red, 0 for black
-	struct node* p; // 'p' for parent pointer
-	struct node* r; // 'r' for right child pointer
-	struct node* l; // 'l' for left child pointer
-};
-// The root of the red-black tree is initialized to NULL as the tree starts empty
-struct node* root = NULL;
-// Function to insert a node into a binary search tree (BST)
-struct node* bst(struct node* trav, struct node* temp) {
-	// If we reach a NULL node, it means we've found the correct place to insert our new node
-	if (trav == NULL)
-		return temp;
-	// We use BST property: left children < parent node < right children
-	if (temp->d < trav->d) {
-		// Recurse to the left subtree if the new node's data is less than the current node's data
-		trav->l = bst(trav->l, temp);
-		// Set the new node's parent to the current node
-		trav->l->p = trav;
-	}
-	else if (temp->d > trav->d) {
-		// Recurse to the right subtree if the new node's data is greater than the current node's data
-		trav->r = bst(trav->r, temp);
-		// Set the new node's parent to the current node
-		trav->r->p = trav;
-	}
-	// The current node is returned if no insertion takes place (it's already in the right position)
-	return trav;
-}
-// Function to perform a right rotation on the tree
-// This is used to maintain the red-black tree properties
-void rightrotate(struct node* temp) {
-	// The left child of 'temp' will become 'temp's new parent
-	struct node* left = temp->l;
-	// The left's right child becomes temp's left child
-	temp->l = left->r;
-	if (temp->l)
-		temp->l->p = temp;
-	left->p = temp->p;
-	// If the 'temp' was the root, the new root will be 'left'
-	if (!temp->p)
-		root = left;
-	// If 'temp' was a left child, then 'left' becomes a left child
-	else if (temp == temp->p->l)
-		temp->p->l = left;
-	// If 'temp' was a right child, then 'left' becomes a right child
-	else
-		temp->p->r = left;
-	left->r = temp;
-	temp->p = left;
-}
-// Function to perform a left rotation on the tree
-// This is used to maintain the red-black tree properties
-void leftrotate(struct node* temp) {
-	// The right child of 'temp' will become 'temp's new parent
-	struct node* right = temp->r;
-	// The right's left child becomes temp's right child
-	temp->r = right->l;
-	if (temp->r)
-		temp->r->p = temp;
-	right->p = temp->p;
-	// If the 'temp' was the root, the new root will be 'right'
-	if (!temp->p)
-		root = right;
-	// If 'temp' was a left child, then 'right' becomes a left child
-	else if (temp == temp->p->l)
-		temp->p->l = right;
-	// If 'temp' was a right child, then 'right' becomes a right child
-	else
-		temp->p->r = right;
-	right->l = temp;
-	temp->p = right;
-}
-// This function is called after BST insertion to fix any red-black tree property violations
-void fixup(struct node* root, struct node* pt) {
-	struct node* parent_pt = NULL;
-	struct node* grand_parent_pt = NULL;
-	// We fix the tree as long as 'pt' is not the root and 'pt' is red and parent of 'pt' is also red
-	while ((pt != root) && (pt->c != 0) && (pt->p->c == 1)) {
-		parent_pt = pt->p;
-		grand_parent_pt = pt->p->p;
-		// If the parent of 'pt' is the left child of the grandparent of 'pt'
-		if (parent_pt == grand_parent_pt->l) {
-			struct node* uncle_pt = grand_parent_pt->r;
-			// If the uncle is red, we only need to recolor
-			if (uncle_pt != NULL && uncle_pt->c == 1) {
-				grand_parent_pt->c = 1;
-				parent_pt->c = 0;
-				uncle_pt->c = 0;
-				pt = grand_parent_pt;
-			}
-			else {
-				// If 'pt' is the right child of its parent, we perform a left rotation
-				if (pt == parent_pt->r) {
-					leftrotate(parent_pt);
-					pt = parent_pt;
-					parent_pt = pt->p;
-				}
-				// After the above, a right rotation is performed
-				rightrotate(grand_parent_pt);
-				int t = parent_pt->c;
-				parent_pt->c = grand_parent_pt->c;
-				grand_parent_pt->c = t;
-				pt = parent_pt;
-			}
-		}
-		else {
-			// Similar fixup as above but with the roles of left and right exchanged
-			struct node* uncle_pt = grand_parent_pt->l;
-			if ((uncle_pt != NULL) && (uncle_pt->c == 1)) {
-				grand_parent_pt->c = 1;
-				parent_pt->c = 0;
-				uncle_pt->c = 0;
-				pt = grand_parent_pt;
-			}
-			else {
-				if (pt == parent_pt->l) {
-					rightrotate(parent_pt);
-					pt = parent_pt;
-					parent_pt = pt->p;
-				}
-				leftrotate(grand_parent_pt);
-				int t = parent_pt->c;
-				parent_pt->c = grand_parent_pt->c;
-				grand_parent_pt->c = t;
-				pt = parent_pt;
-			}
-		}
-	}
-}
-// Function to print the in-order traversal of the tree
-void inorder(struct node* trav) {
-	if (trav == NULL)
-		return;
-	inorder(trav->l);
-	printf("%d ", trav->d);
-	inorder(trav->r);
-}
-// Main function where the execution of the program begins
+// Global variables
+int n = 5; // Number of items
+int p[10] = { 3, 3, 2, 5, 1 }; // Array storing weights of items
+int w[10] = { 10, 15, 10, 12, 8 }; // Array storing values of items
+int W = 10; // Maximum weight capacity of the knapsack
 int main() {
-	int n = 7; // Number of nodes to be inserted
-	int a[7] = { 7, 6, 5, 4, 3, 2, 1 }; // The values to be inserted into the tree
-	// Loop to insert nodes into the tree
-	for (int i = 0; i < n; i++) {
-		// Creating a new node with the value from the array and color it red (1)
-		struct node* temp = (struct node*)malloc(sizeof(struct node));
-		temp->r = NULL;
-		temp->l = NULL;
-		temp->p = NULL;
-		temp->d = a[i];
-		temp->c = 1;
-		// Perform BST insertion with the new node
-		root = bst(root, temp);
-		// Fix any violations after BST insertion
-		fixup(root, temp);
-		// Ensure the root is always black (0)
-		root->c = 0;
+	int cur_w; // Current weight of the knapsack
+	float tot_v = 0; // Total value of items in the knapsack, initialized to 0
+	int i, maxi; // Loop counters and index of the current item
+	int used[10]; // Array to track whether an item is used
+	// Initialize the used array to 0 for all items
+	for (i = 0; i < n; ++i)
+		used[i] = 0; //사용한 적이 있는지 없음:0 있음:1
+	cur_w = W; // Set current weight to the knapsack's capacity
+	// Main loop to add items to the knapsack
+	while (cur_w > 0) {
+		maxi = -1; // Reset the index of the chosen item
+		// Find the item with the best value-to-weight ratio that hasn't been used
+		for (i = 0; i < n; ++i)
+			if ((used[i] == 0) && ((maxi == -1) || ((float)w[i] / p[i] > (float)w[maxi] / p[maxi]))) //사용한적 없고 (for문 처음이거나 or 무게당 가치가 best보다 큰경우) -> 결국은 무게당 가치 젤 높은거 찾기
+				maxi = i;
+		used[maxi] = 1; // Mark the chosen item as used
+		cur_w = cur_w - p[maxi]; // Reduce current weight by the weight of the chosen item
+		tot_v = tot_v + w[maxi]; // Add the value of the chosen item to the total value
+		// Print information about the added item
+		if (cur_w >= 0)
+			printf("Added object %d (%d, %d) completely in the bag. Space left: %d.\n", maxi + 1, w[maxi], p[maxi], cur_w);
+		else {
+			// If only part of the item was added due to weight constraints
+			printf("Added %d%% (%d, %d) of object %d in the bag.\n", (int)((1 + (float)cur_w / p[maxi]) * 100), w[maxi], p[maxi], maxi + 1); //무게가 넘치는 경우 마지막 추가될 무게의 몇%만이 포함됨
+			tot_v = tot_v - w[maxi]; // Remove the value of the entire item
+			tot_v = tot_v + (1 + (float)cur_w / p[maxi]) * w[maxi]; // Add the value of the part of the item / 43+ ((1+-4.0/5) * 12)
+		}
 	}
-	// Print the in-order traversal of the tree to show the final structure
-	printf("Inorder Traversal of Created Tree\n");
-	inorder(root);
-	return 0; // End of program
+	// Print the final total value of items in the knapsack
+	printf("Filled the bag with objects worth %.2f.\n", tot_v);
+	return 0;
 }
